@@ -1,0 +1,24 @@
+{% extends "basic_html_setup.html" %}
+{% block extra_headers %}
+<meta name="google-signin-client_id" content="46911401844-burl37qinpom3jl9ptb3ilisio6clojq.apps.googleusercontent.com">
+<script>
+    function signOut() {
+      var auth2 = gapi.auth2.getAuthInstance();
+      auth2.signOut().then(function () {
+        console.log('User signed out.');
+      });
+    }
+
+    function onLoad() {
+      gapi.load('auth2', function() {
+        gapi.auth2.init();
+      });
+    }
+  </script>
+{% endblock %}
+
+{% block content %}
+<div> <h1>You're not from round these parts are you... </h1> ...real talk though please use your CMC, mudd, or pitzer email to log in so we can make sure you go here! Click <a href="/" onclick="signOut();">here </a>to try again.</div>
+<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+
+{% endblock %}

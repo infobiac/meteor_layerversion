@@ -1,0 +1,230 @@
+{% extends "basic_html_setup.html" %}
+
+{% block title %}
+meteor
+{% endblock %}
+{% block extra_headers %}
+<link rel="stylesheet" href="../static/css/flat-ui.min.css">
+<link rel="stylesheet" href="../static/css/appstyles.css">
+<link rel = "stylesheet" href='/static/css/convostyles.css'>
+<meta name="google-signin-client_id" content="46911401844-burl37qinpom3jl9ptb3ilisio6clojq.apps.googleusercontent.com">
+<!-- <script src='../static/js/flat-ui.js'></script> -->
+<script>
+    function signOut() {
+      var auth2 = gapi.auth2.getAuthInstance();
+      auth2.signOut().then(function () {
+        console.log('User signed out.');
+      });
+    }
+
+    function onLoad() {
+      gapi.load('auth2', function() {
+        gapi.auth2.init();
+      });
+    }
+  </script>
+
+
+{% endblock %}
+
+
+{% block content %}
+
+  <div id="navbar" >
+      <nav class="navbar navbar-inverse navbar-fixed-top" style="margin-bottom:0px; margin-top:-10px;"role="navigation">
+        <div class="container-fluid">
+          <div class="navbar-header" >
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+          </div>
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav" style="padding-top:20px">
+              <li id="mess-act"><a id="dastug" href='#' type="button">
+                <span class = "glyphicon glyphicon-envelope"></span>
+              </a></li>
+              <li id="cal-act"><a id="dastug2" href='#' type="button">
+                <span class = "glyphicon glyphicon-calendar"></span>
+              </a></li>
+              <li><a href='#' type="button" data-toggle="modal" data-target="#myModal">
+                <span class = "glyphicon glyphicon-plus"></span>
+              </a></li>
+              
+            </ul>
+            <ul class="nav navbar-right">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="padding-top:19px"> <span style="color:#1abc9c"> {{welcome}} {{name}}!</span> <img class="img-circle" style="height:50px;width:50px;"src={{img}}><b class="caret" style="color:#1abc9c"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Profile</a></li>
+                  <li><a href="mailto:infobiac1@gmail.com">Report a bug</a></li>
+                  <li><a href="#">Terms</a></li>
+                  <li class="divider"></li>
+                  <li>
+                    <a href="/signedout" onclick="signOut();">Sign out</a>
+                    <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+      </nav>
+  </div><!--  end navbar --> 
+
+  
+<div class='container-fluid'>	
+  <div class="row">
+
+
+    <div id="dastuggler" style="display:none" class="col-md-3">
+      <h2 style="text-align:center; color:white; margin-top:65px">Convos you're in</h2>
+      <div style="text-align:center; width:90%; margin-left:auto;margin-right:auto;">
+        {% if personallist %}
+            {% for test in personallist %}
+              <div style="padding-top:10px;">
+                <a class="btn btn-primary" style="white-space: normal;" href="/app/convo?convoid={{test.url}}" role="button">{{test.metadata.message}}</a>
+              </div>
+              <hr style="width:65%;">
+            {% endfor %}
+          {% else %}
+            <h3 style="text-align:center">No convos found<h3>
+          {% endif %}
+        </div>
+    </div>
+
+
+  	<div id='mainel' class="col-xs-12 col-sm-12 col-md-12" style="height:100vh;float:right; margin-top:45px">
+      <h2 style='text-align:center; color:#edeff1;'>Meteor<span style='color:#1abc9c'>.</span></h2>
+      <div style="text-align:center;">
+        {% if convolist %}
+          {% for test in convolist %}
+
+          <div class='convo-container'>
+            <div class='convo-inner'>
+              <div>
+                <h4 style="padding-top:15px;">{{test.metadata.message}}</h4>
+                {{test.metadata.description}}, started by
+                <br>
+                <a class="btn btn-primary" href="/app/convo?convoid={{test.url}}" role="button" style="margin-top:10px">View it</a> 
+                <a id="view-{{forloop.counter}}"class="btn btn-primary" role="button" data-toggle="collapse" href="#collapsed-convo-{{forloop.counter}}" style="margin-top:10px">View it</a>
+              </div>
+              <div class="collapse" id="collapsed-convo-{{forloop.counter}}">
+                <div id="convo-box-{{forloop.counter}}">
+                    <div style="text-align:center">
+                      Loading
+                      <br>
+                      <img style="margin-right:auto; margin-left:auto"src="../static/img/ajax-loader.gif">
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+          </div>
+
+            
+            <script>
+              $('#view-{{forloop.counter}}').click(function() {
+                if ($('#view-{{forloop.counter}}').text()=='View it'){
+                  $('#view-{{forloop.counter}}').text('Collapse');
+                }
+                else{
+                  $('#view-{{forloop.counter}}').text('View it');
+                }
+                  $.post( "/convo_get/", { url:'{{test.messages_url}}'}).done(function(data){
+                    convoBody = data['convo'];
+                    inConvo = data['inConvo'];
+                    console.log(inConvo);
+                    addConvo(convoBody, inConvo);
+                  });
+
+                  function addConvo(insideConvo,checkInConvo){
+                    if (checkInConvo=='yes'){
+                      var extra = "<textarea placeholder='send a message...'rows='2' cols='30' class='message-send form-control flat message-box'></textarea> <br> <a class='btn btn-primary' id='send-button-{{forloop.counter}}' role='button'>Send</a> <a class='btn btn-danger' onclick='leaveClicked()' role='button'>Leave</a>";
+                    }
+                    else{
+                      var extra="<a id='join-{{forloop.counter}}'class='btn btn-info' role='button' style='margin-top:10px'>Join</a>"
+                    }
+                    document.getElementById("convo-box-{{forloop.counter}}").innerHTML="<div class='FixedHeightContainer outer-box' ><div id='convobox' class='Content'>"+insideConvo+"</div></div>" + extra;
+
+                  };
+                  
+              });
+            </script>
+
+          {% endfor %}
+        {% else %}
+          <h3 style="text-align:center">No convos found<h3>
+        {% endif %}
+      </div>
+
+      <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">Post your meteor</h4>
+            </div>
+            <div class="modal-body">
+              <h4>I want...</h4>
+              <div>
+                <textarea placeholder='what do you want?' class="form-control flat" style='resize:none'id="texas" rows="1" cols="50"></textarea>
+              </div>
+              <h5>Description</h5>
+              <div>
+                <textarea placeholder='For if your post is particularly verbose...' style='resize:none' class="form-control flat" id="texas2" rows="2" cols="50"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+              <a class="btn btn-primary" id="mybutton" role="button">Submit</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$('#mybutton').click(function() {
+    var message = $('#texas').val();
+    var description = $('#texas2').val();
+    initiateConvo(message,description);
+});
+function initiateConvo(message, description) {
+      $.post("/app/init_convo/", {message: message, description:description}).done(postreceipt());
+      $("#texas").val('');
+      $("#texas2").val('');
+      notie.alert(1, 'Posted! Refresh to see it.', 3);
+    }
+function postreceipt(){
+  $('#myModal').modal('hide');
+  }
+  $('#dastug').click(function(){
+    $('#dastuggler').toggle({display:false,complete: smallenMain()});
+  })
+function smallenMain(){
+    if (document.getElementById("mainel").className=='col-xs-12 col-sm-12 col-md-12'){
+      document.getElementById("mainel").className = "col-md-9";
+      document.getElementById("mess-act").className = "active";
+    }
+    else{
+      document.getElementById("mainel").className = "col-xs-12 col-sm-12 col-md-12";
+      document.getElementById("mess-act").className = "nooutline";
+      document.getElementById('mess-act').blur();
+    }
+      
+  }
+
+function leaveClicked(){
+  notie.confirm('Did you mean to hit collapse, or do you really want to leave this chat?', 'I want to leave!', 'I want to stay in it.', function() {
+    notie.alert(1, "Ok, you've left it!", 2);
+  });
+}
+
+</script>
+<script src="../static/js/notie.js"></script>
+
+{% endblock %}

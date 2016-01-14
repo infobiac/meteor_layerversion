@@ -1,0 +1,17 @@
+{% extends "basic_html_setup.html" %}
+{% block extra_headers %}
+<meta name="google-signin-client_id" content="46911401844-burl37qinpom3jl9ptb3ilisio6clojq.apps.googleusercontent.com">
+{% endblock %}
+
+{% block content %}
+	{% if convolist %}
+		{% for test in convolist %}
+			<div>
+				{{test.metadata.message}} at {{test.metadata.location}}
+				<a class="btn btn-default" href="/app/convo?convoid={{test.url}}" role="button">View</a> 
+			</div>
+		{% endfor %}
+	{% else %}
+		<h3 style="text-align:center">No convos found<h3>
+	{% endif %}
+{% endblock %}

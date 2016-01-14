@@ -1,0 +1,32 @@
+.FixedHeightContainer
+{
+  height: 250px;
+  width:100%; 
+  padding:3px; 
+}
+.Content
+{
+  height:224px;
+   overflow:auto;
+
+}
+.outer-box{
+	margin-top:10px; 
+	width:95%; 
+/*	border-style: solid; 
+	border-width: 1px; 
+	border-color: #999999; */
+	margin-right:auto; 
+	margin-left:auto; 
+	text-align:left; 
+	border-radius:4px;
+	background-color:white;
+}
+
+.message-box{
+	resize:none; 
+	background-color:#edeff1; 
+	width:95%; 
+	margin-right:auto;
+	margin-left:auto;
+}

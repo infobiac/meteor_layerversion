@@ -1,0 +1,14 @@
+{% extends "basic_html_setup.html" %}
+{% block extra_headers %}
+{% endblock %}
+
+{% block content %}
+	<div> looks like you haven't logged in before... give us a second to get things ready for you!</div>
+	<script>
+		$.ajax({
+			url:"/initial_setup/",
+			async:false,
+		}).done(window.location.replace("/app"));
+	</script>
+
+{% endblock %}

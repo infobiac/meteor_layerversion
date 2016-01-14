@@ -1,0 +1,26 @@
+<html>
+	<head>
+		<script src="https://apis.google.com/js/platform.js" async defer></script>
+		<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<meta name="google-signin-client_id" content="46911401844-burl37qinpom3jl9ptb3ilisio6clojq.apps.googleusercontent.com">
+		<script>
+			function onSignIn(googleUser) {
+			  var profile = googleUser.getBasicProfile();
+			  console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+			  console.log('Name: ' + profile.getName());
+			  console.log('Image URL: ' + profile.getImageUrl());
+			  console.log('Email: ' + profile.getEmail());
+			  document.getElementById("sign-in").innerHTML = '<p>fetching loading shit</p><img src="http://www.arabianbusiness.com/skins/ab.main/gfx/loading_spinner.gif">';
+				var id_token = googleUser.getAuthResponse().id_token
+				$.post( "/init_login_data_store/", { idtoken :id_token, name: profile.getName(), email:  profile.getEmail(), pic: profile.getImageUrl()}).done(function(data){
+						console.log("Data Loaded: " + data);
+						window.location = "/app";
+					});
+
+				}
+		</script>
+	</head>
+	<body>
+		<div id = "sign-in" class="g-signin2" data-onsuccess="onSignIn"></div>
+	</body>
+</html>

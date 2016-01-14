@@ -1,0 +1,134 @@
+{% extends "basic_html_setup.html" %}
+
+{% block extra_headers %}
+<link rel = "stylesheet" href='/static/css/convostyles.css'>
+{% endblock %}
+
+{% block content %}
+<a class="btn btn-default" id="back" role="button" href='/app'>Back</a>
+<div class = "FixedHeightContainer">
+    <div id = "convobox" class = "Content">
+        <p>{{convo | safe}}</p>
+        <p id="newArrived"></p>
+   </div>
+</div>
+
+<textarea id="texas" style ="margin-right:100%" rows="2" cols="50" placeholder="Send a message"></textarea>
+ 
+
+<a class='btn btn-default' id='mybutton' role='button'>Send</a>
+<script>
+$('#mybutton').click(function() {
+    var text = $('textarea').val();
+    sendMessage(text);
+    $("#texas").val('');
+    scrollToBottom();
+});
+function sendMessage(text) {
+	auth = 'Layer session-token='+"{{seshid}}"
+        return $.ajax({
+            url: "{{url}}",
+            method: "POST",
+            headers: {
+            	Accept:'application/vnd.layer+json; version=1.0',
+            	Authorization: auth,
+            	"Content-type":"application/json"
+            },
+            data: JSON.stringify({
+                parts: [{
+                    body: text,
+                    mime_type: "text/plain"
+                }]
+            })
+        });
+    }
+</script>
+<script>
+
+    var objectCache = {};
+    var ws = new WebSocket('wss://api.layer.com/websocket?session_token={{seshid}}',
+        'layer-1.0');
+    ws.addEventListener('message', onMessage);
+    function onMessage(evt) {
+        var msg = JSON.parse(evt.data);
+        var body = msg.body;
+        var test =  JSON.stringify(body.data.parts[0].body, false, 4);
+        var test2 =  JSON.stringify(body.data.sender.user_id, false, 4);
+        test = test.replace(/^"(.+(?="$))"$/, '$1');
+        test2 = test2.replace(/^"(.+(?="$))"$/, '$1');
+        var name = $.get('../support/qpdiogtqerfsdfrwde134sf',{id:test2});
+        console.log(name.responseText)
+        name.done(function(result){
+            str = '<p>' + result + ': ' + test + '</p>';
+            $('#newArrived').append(str);;
+        });
+        
+        // document.write(': ');
+        // document.write(JSON.stringify(test, false, 4));
+        // switch(msg.type) {
+        //     case "change":
+        //         handleChange(body);
+        //         break;
+        // }
+    }
+    
+    function handleChange(msg) {
+        try {
+            switch(msg.operation) {
+                // On receiving a create event, notify the app
+                // of the new object, and cache the object
+                case "create":
+                    objectCache[msg.object.id] = msg.data;
+                    log("WEBSOCKET CREATE: " + msg.object.id);
+                    break;
+
+                // On receiving a delete event, notify the app of
+                // the removed object, and remove it from cache
+                case "delete":
+                    delete objectCache[msg.object.id];
+                    log("WEBSOCKET DELETE: " + msg.object.id);
+                    break;
+
+                // On receiving a patch event, let the parser handle it.
+                // Find the object to be modified, and if it exists, pass it and
+                // the operations to the parser.
+                // The changeCallbacks handler will notify the app
+                // of any changes.
+                case "patch":
+                    var objectToChange = objectCache[msg.object.id];
+                    if (objectToChange) {
+                        log("WEBSOCKET PATCH: " + msg.object.id + ": " + JSON.stringify(msg.data, false, 4));
+                        parser.parse({
+                            object: objectToChange,
+                            type: msg.object.type,
+                            operations: msg.data
+                        });
+                    }
+                    break;
+            }
+        } catch(e) {
+            console.error("layer-patch Error: " + e);
+        }
+    }
+</script>
+<script>
+$(document).ready(function(){
+    scrollToBottom()
+    $('#texas').keypress(function(e){
+      if(e.keyCode==13){
+        $('#mybutton').click();
+        $('#texas').prop('selectionStart',0) .prop('selectionEnd', 0);
+      }
+
+    });
+});
+</script>
+<script>
+function scrollToBottom(){ 
+    $('#convobox').animate({
+  scrollTop: $('#convobox').get(0).scrollHeight}, 500);
+}
+
+</script>
+
+{% endblock %}

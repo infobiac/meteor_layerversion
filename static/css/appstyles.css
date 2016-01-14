@@ -1,0 +1,24 @@
+body{
+	background-color:#2f4154;
+	
+}
+
+.convo-container{
+	width:35%;
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:40px;
+	background-color:#edeff1;
+	border-radius:15px;
+	box-shadow: 5px 5px 5px #000;
+}
+
+.convo-inner{
+	padding-bottom: 15px;
+}
+
+.nooutline {
+  outline: none;
+  color:black;
+}
+
