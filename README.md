@@ -1,1 +1,3 @@
 # meteor_layerversion
+
+Please read the story here: https://medium.com/@christopherimann/making-a-social-network-30b71ce48873#.4stihe951 for info about this version. Tldr; this version was SUPER disorganized, and used layer, which cost way too much money...
